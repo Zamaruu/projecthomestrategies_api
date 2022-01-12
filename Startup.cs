@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace projecthomestrategies_api
 {
@@ -30,8 +31,13 @@ namespace projecthomestrategies_api
         {
 
             services.AddControllers();
-            // services.AddControllers().AddNewtonsoftJson();
-            services.Configure<AppSettingsService>(Configuration.GetSection("MySettings"));  
+            
+            services.AddDbContext<HomeStrategiesContext>(options => options.UseMySQL(Configuration.GetConnectionString("MySQLConnectionString")));
+
+            services.AddMvc(option => option.EnableEndpointRouting = false)
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "projecthomestrategies_api", Version = "v1" });
