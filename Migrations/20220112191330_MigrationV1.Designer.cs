@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace projecthomestrategies_api.Migrations
 {
     [DbContext(typeof(HomeStrategiesContext))]
-    [Migration("20220112173259_MigrationV1")]
+    [Migration("20220112191330_MigrationV1")]
     partial class MigrationV1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,7 +57,7 @@ namespace projecthomestrategies_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("BullCategoryName")
+                    b.Property<string>("BillCategoryName")
                         .HasColumnType("text");
 
                     b.Property<int?>("HouseholdId")

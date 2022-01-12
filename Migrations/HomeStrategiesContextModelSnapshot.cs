@@ -55,7 +55,7 @@ namespace projecthomestrategies_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("BullCategoryName")
+                    b.Property<string>("BillCategoryName")
                         .HasColumnType("text");
 
                     b.Property<int?>("HouseholdId")

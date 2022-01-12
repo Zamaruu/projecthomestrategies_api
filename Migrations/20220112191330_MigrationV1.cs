@@ -27,7 +27,7 @@ namespace projecthomestrategies_api.Migrations
                 {
                     BillCategoryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    BullCategoryName = table.Column<string>(type: "text", nullable: true),
+                    BillCategoryName = table.Column<string>(type: "text", nullable: true),
                     HouseholdId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>

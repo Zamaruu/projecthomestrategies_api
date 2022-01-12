@@ -6,7 +6,7 @@ namespace HomeStrategiesApi.Models
     public class BillCategory
     {
         public int BillCategoryId { get; set; }
-        public string BullCategoryName { get; set; }
+        public string BillCategoryName { get; set; }
         public Household Household { get; set; }
     }
 }
