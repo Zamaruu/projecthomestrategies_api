@@ -14,6 +14,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using projecthomestrategies_api.Helper;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace projecthomestrategies_api
 {
@@ -34,9 +38,37 @@ namespace projecthomestrategies_api
             
             services.AddDbContext<HomeStrategiesContext>(options => options.UseMySQL(Configuration.GetConnectionString("MySQLConnectionString")));
 
+            //Allow reference looping
             services.AddMvc(option => option.EnableEndpointRouting = false)
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+
+            //JWT settings injection
+            var jwtSettings = Configuration.GetSection("JWTSettings");
+            services.Configure<JWTSettings>(jwtSettings);
+
+            //To validate JWT
+            var appSettings = jwtSettings.Get<JWTSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.AppSecret);
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = true;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
             services.AddSwaggerGen(c =>
             {
@@ -58,6 +90,7 @@ namespace projecthomestrategies_api
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
