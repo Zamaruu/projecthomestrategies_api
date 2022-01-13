@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HomeStrategiesApi.Helper;
 using HomeStrategiesApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace projecthomestrategies_api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class BillsController : ControllerBase

@@ -8,9 +8,11 @@ using HomeStrategiesApi.Helper;
 using System.Threading.Tasks;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HomeStrategiesApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
@@ -56,22 +58,22 @@ namespace HomeStrategiesApi.Controllers
             }
         }
 
-        [HttpPost("basic")]
-        [Consumes("application/json")]
-        public IActionResult Post([FromBody]User user){
-            try
-            {
-                user.Type = UserType.Basic;
-                _context.User.Add(user);
-                _context.SaveChanges();
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-                throw;
-            }
-        }
+        //[HttpPost("basic")]
+        //[Consumes("application/json")]
+        //public IActionResult Post([FromBody]User user){
+        //    try
+        //    {
+        //        user.Type = UserType.Basic;
+        //        _context.User.Add(user);
+        //        _context.SaveChanges();
+        //        return Ok();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return BadRequest(e);
+        //        throw;
+        //    }
+        //}
 
         [HttpPut("{id}")]
         [Consumes("application/json")]

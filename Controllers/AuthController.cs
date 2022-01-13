@@ -44,26 +44,87 @@ namespace projecthomestrategies_api.Controllers
             }
         }
 
-        private User GetUserFromBase64Credential(string rawCredentials)
+        [HttpPost("signup/basic")]
+        public IActionResult SignUpBasic([FromBody]RegisterModel registerModel)
         {
-            var bytes = Convert.FromBase64String(rawCredentials);
-            string[] credentials = Encoding.UTF8.GetString(bytes).Split(":");
-            
-            var email = credentials[0];
-            var password = credentials[1];
-
-            var user = _context.User
-                            .Where(u => u.Email.Equals(email) && u.Password.Equals(password))
-                            .FirstOrDefault();
-
-            if(user == null)
+            var newUser = new User
             {
-                return null;
+                Email = registerModel.Email,
+                Password = registerModel.Password,
+                Firstname = registerModel.Firstname,
+                Surname = registerModel.Surname,
+                Type = UserType.Basic,
+            };
+
+            _context.User.Add(newUser);
+            _context.SaveChanges();
+
+            var newlyCreatedUser = _context.User.Where(u => u.Email.Equals(registerModel.Email));
+            if(newlyCreatedUser == null)
+            {
+                return BadRequest("New user could not be found!");
             }
             else
             {
-                return user;
+                return Ok(newlyCreatedUser);
             }
+        }
+
+        [HttpPost("signup/admin")]
+        public IActionResult SignUpAdmin([FromBody] RegisterModel registerModel)
+        {
+            var newUser = new User
+            {
+                Email = registerModel.Email,
+                Password = registerModel.Password,
+                Firstname = registerModel.Firstname,
+                Surname = registerModel.Surname,
+                Type = UserType.Admin,
+            };
+
+            _context.User.Add(newUser);
+            _context.SaveChanges();
+
+            var newlyCreatedAdmin = _context.User.Where(u => u.Email.Equals(registerModel.Email));
+            
+            if (newlyCreatedAdmin == null)
+            {
+                return BadRequest("New user could not be found!");
+            }
+            else
+            {
+                return Ok(newlyCreatedAdmin);
+            }
+        }
+
+        private User GetUserFromBase64Credential(string rawCredentials)
+        {
+            try
+            {
+                var bytes = Convert.FromBase64String(rawCredentials);
+                string[] credentials = Encoding.UTF8.GetString(bytes).Split(":");
+
+                var email = credentials[0];
+                var password = credentials[1];
+
+                var user = _context.User
+                                .Where(u => u.Email.Equals(email) && u.Password.Equals(password))
+                                .FirstOrDefault();
+
+                if (user == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return user;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            
         }
 
         private string GenerateToken(User user)
