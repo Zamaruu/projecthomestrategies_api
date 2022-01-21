@@ -58,6 +58,40 @@ namespace HomeStrategiesApi.Controllers
             }
         }
 
+        [HttpGet("ForHousehold/{email}")]
+        public IActionResult GetUserForHousehold(string email)
+        {
+            User result = _context.User
+                    .Include(u => u.Household)
+                    .Where(u => u.Email.Equals(email))
+                    .Select(u => new User
+                    {
+                        UserId = u.UserId,
+                        Firstname = u.Firstname,
+                        Surname = u.Surname,
+                        Email = u.Email,
+                        UserColor = u.UserColor,
+                        Household = u.Household,
+                    })
+                    .FirstOrDefault();
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                if(result.Household == null)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("Benutzer ist bereits in einem Haushalt");
+                }
+            }
+        }
+
         //[HttpPost("basic")]
         //[Consumes("application/json")]
         //public IActionResult Post([FromBody]User user){

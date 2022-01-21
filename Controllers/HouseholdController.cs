@@ -35,10 +35,25 @@ namespace HomeStrategiesApi.Controllers
             }
         }
 
-        [HttpGet("members/{id}")]
+        [HttpGet("Members/{id}")]
         public IActionResult GetHouseholdUsers(int id)
         {
             var result = GetHouseholdMember(id);
+            if (result == null) return NotFound();
+            else
+            {
+                return Ok(result);
+            }
+        }
+
+        [HttpGet("Management/{id}")]
+        public IActionResult GetHouseholdForManagement(int id)
+        {
+            var result = _context.Households
+                    .Include(hshld => hshld.HouseholdMember)
+                    .Include(hshld => hshld.HouseholdCreator)
+                    .Where(hshld => hshld.HouseholdId.Equals(id))
+                    .FirstOrDefault();
             if (result == null) return NotFound();
             else
             {
@@ -54,7 +69,8 @@ namespace HomeStrategiesApi.Controllers
             {
                 _context.Households.Add(household);
                 _context.SaveChanges();
-                return Ok();
+
+                return Ok(household);
             }
             catch (Exception e)
             {
@@ -63,7 +79,7 @@ namespace HomeStrategiesApi.Controllers
             }
         }
 
-        [HttpPost("addUser")]
+        [HttpPost("AddUser")]
         [Consumes("application/json")]
         public async Task<IActionResult> AddUserToHousehold(string email, int householdId)
         {
@@ -78,7 +94,7 @@ namespace HomeStrategiesApi.Controllers
                         user.Household = household;
                         _context.Entry(user).CurrentValues.SetValues(user);
                         _context.SaveChanges();
-                        return Ok();
+                        return Ok(user);
                     }
                     else
                     {
@@ -140,17 +156,30 @@ namespace HomeStrategiesApi.Controllers
             }
         }
 
-        [HttpDelete("removeUser/{id}")]
-        public async Task<IActionResult> RemoveUserFromHousehold(int id)
+        [HttpDelete("RemoveUser/")]
+        public async Task<IActionResult> RemoveUserFromHousehold(int userId, int householdId)
         {
-            var result = await ChangeHouseholdOfUser(id, 0);
-            if (result == 1)
+            var user = _context.User
+                            .Where(u => u.UserId.Equals(userId))
+                            .Include(u => u.Household)
+                            .FirstOrDefault();
+            var household = await _context.Households.FindAsync(householdId);
+
+            if(user.Household.HouseholdId == household.HouseholdId)
             {
-                return Ok();
+                var result = await ChangeHouseholdOfUser(userId, 0);
+                if (result == 1)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Fehler beim entfernen des Benutzers");
+                }
             }
             else
             {
-                return BadRequest("Fehler beim entfernen des Benutzers");
+                return BadRequest("IDs stimmen nicht überein");
             }
         }
 

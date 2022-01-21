@@ -20,5 +20,6 @@ namespace HomeStrategiesApi.Models
         public UserType Type { get; set; }
         
         public Household Household { get; set; }
+        public Household AdminOfHousehold { get; set; }
     }
 }

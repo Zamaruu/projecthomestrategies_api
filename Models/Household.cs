@@ -8,6 +8,8 @@ namespace HomeStrategiesApi.Models
     {
         public int HouseholdId { get; set; }
         public string HouseholdName { get; set; }
+        public int AdminId { get; set; }
+        public User HouseholdCreator { get; set; }
         public List<User> HouseholdMember { get; set; }
         public List<Bill> HouseholdBills { get; set; }
     }

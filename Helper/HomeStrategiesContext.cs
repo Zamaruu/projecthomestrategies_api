@@ -18,6 +18,11 @@ namespace HomeStrategiesApi.Helper
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Household>()
+               .HasOne(h => h.HouseholdCreator)
+               .WithOne(u => u.AdminOfHousehold)
+               .HasForeignKey<Household>(h => h.AdminId);
+
             //modelBuilder.Entity<Household>()
             //    .HasMany(h => h.householdeMember)
             //    .WithOne(u => u.household);
