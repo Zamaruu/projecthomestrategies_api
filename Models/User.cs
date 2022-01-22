@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HomeStrategiesApi.Models
@@ -21,5 +22,6 @@ namespace HomeStrategiesApi.Models
         
         public Household Household { get; set; }
         public Household AdminOfHousehold { get; set; }
+        public List<Notification> Notifications { get; set; }
     }
 }

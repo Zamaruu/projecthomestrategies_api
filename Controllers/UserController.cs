@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace HomeStrategiesApi.Controllers
 {
@@ -35,6 +36,7 @@ namespace HomeStrategiesApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id, bool includeDetails = false)
         {
+            var authorized = IsCallAuthorized(checkUserId: id);
             User result;
             if (includeDetails)
             {
@@ -137,6 +139,29 @@ namespace HomeStrategiesApi.Controllers
                 _context.User.Remove(user);
                 _context.SaveChanges();
             }
+        }
+
+        private bool IsCallAuthorized(int checkUserId = 0, int checkHouseholdId = 0)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+            if (identity != null)
+            {
+                IEnumerable<Claim> claims = identity.Claims;
+                // or
+                var userIdClaim = identity.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var householdIdClaim = identity.FindFirst(ClaimTypes.GroupSid).Value;
+
+                var userID = int.Parse(userIdClaim);
+                var householdId = string.IsNullOrEmpty(householdIdClaim)? 0: int.Parse(householdIdClaim);
+
+                if(userID == checkUserId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -10,6 +10,7 @@ namespace HomeStrategiesApi.Helper
         public DbSet<Household> Households { get; set; }
         public DbSet<Bill> Bills { get; set; }
         public DbSet<BillCategory> BillCategories { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         public HomeStrategiesContext(DbContextOptions<HomeStrategiesContext> options) : base(options)
         {
