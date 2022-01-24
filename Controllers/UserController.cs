@@ -27,11 +27,11 @@ namespace HomeStrategiesApi.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return Ok(_context.User);
-        }
+        //[HttpGet]
+        //public IActionResult Get()
+        //{
+        //    return Ok(_context.User);
+        //}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id, bool includeDetails = false)

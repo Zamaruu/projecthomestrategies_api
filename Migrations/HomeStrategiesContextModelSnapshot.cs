@@ -168,7 +168,7 @@ namespace projecthomestrategies_api.Migrations
             modelBuilder.Entity("HomeStrategiesApi.Models.BillCategory", b =>
                 {
                     b.HasOne("HomeStrategiesApi.Models.Household", "Household")
-                        .WithMany()
+                        .WithMany("HouseholdBillCategories")
                         .HasForeignKey("HouseholdId");
 
                     b.Navigation("Household");
@@ -205,6 +205,8 @@ namespace projecthomestrategies_api.Migrations
 
             modelBuilder.Entity("HomeStrategiesApi.Models.Household", b =>
                 {
+                    b.Navigation("HouseholdBillCategories");
+
                     b.Navigation("HouseholdBills");
 
                     b.Navigation("HouseholdMember");

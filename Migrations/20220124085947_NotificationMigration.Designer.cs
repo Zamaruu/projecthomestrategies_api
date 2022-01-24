@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace projecthomestrategies_api.Migrations
 {
     [DbContext(typeof(HomeStrategiesContext))]
-    [Migration("20220122131146_NotificationMigration")]
+    [Migration("20220124085947_NotificationMigration")]
     partial class NotificationMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

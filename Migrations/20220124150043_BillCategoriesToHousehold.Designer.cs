@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace projecthomestrategies_api.Migrations
 {
     [DbContext(typeof(HomeStrategiesContext))]
-    [Migration("20220113172154_MigrationV2")]
-    partial class MigrationV2
+    [Migration("20220124150043_BillCategoriesToHousehold")]
+    partial class BillCategoriesToHousehold
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -76,12 +76,40 @@ namespace projecthomestrategies_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("AdminId")
+                        .HasColumnType("int");
+
                     b.Property<string>("HouseholdName")
                         .HasColumnType("text");
 
                     b.HasKey("HouseholdId");
 
+                    b.HasIndex("AdminId")
+                        .IsUnique();
+
                     b.ToTable("Households");
+                });
+
+            modelBuilder.Entity("HomeStrategiesApi.Models.Notification", b =>
+                {
+                    b.Property<int>("NotificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Seen")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("NotificationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("HomeStrategiesApi.Models.User", b =>
@@ -142,10 +170,30 @@ namespace projecthomestrategies_api.Migrations
             modelBuilder.Entity("HomeStrategiesApi.Models.BillCategory", b =>
                 {
                     b.HasOne("HomeStrategiesApi.Models.Household", "Household")
-                        .WithMany()
+                        .WithMany("HouseholdBillCategories")
                         .HasForeignKey("HouseholdId");
 
                     b.Navigation("Household");
+                });
+
+            modelBuilder.Entity("HomeStrategiesApi.Models.Household", b =>
+                {
+                    b.HasOne("HomeStrategiesApi.Models.User", "HouseholdCreator")
+                        .WithOne("AdminOfHousehold")
+                        .HasForeignKey("HomeStrategiesApi.Models.Household", "AdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HouseholdCreator");
+                });
+
+            modelBuilder.Entity("HomeStrategiesApi.Models.Notification", b =>
+                {
+                    b.HasOne("HomeStrategiesApi.Models.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeStrategiesApi.Models.User", b =>
@@ -159,9 +207,18 @@ namespace projecthomestrategies_api.Migrations
 
             modelBuilder.Entity("HomeStrategiesApi.Models.Household", b =>
                 {
+                    b.Navigation("HouseholdBillCategories");
+
                     b.Navigation("HouseholdBills");
 
                     b.Navigation("HouseholdMember");
+                });
+
+            modelBuilder.Entity("HomeStrategiesApi.Models.User", b =>
+                {
+                    b.Navigation("AdminOfHousehold");
+
+                    b.Navigation("Notifications");
                 });
 #pragma warning restore 612, 618
         }

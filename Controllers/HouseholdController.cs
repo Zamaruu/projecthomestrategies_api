@@ -84,6 +84,7 @@ namespace HomeStrategiesApi.Controllers
         public async Task<IActionResult> AddUserToHousehold(string email, int householdId)
         {
             var user = _context.User.FirstOrDefault(u => u.Email.Equals(email));
+
             try
             {
                 if (user.Household == null)
@@ -94,6 +95,17 @@ namespace HomeStrategiesApi.Controllers
                         user.Household = household;
                         _context.Entry(user).CurrentValues.SetValues(user);
                         _context.SaveChanges();
+
+                        var notificationHelper = new NotificationHelper(
+                        new Notification
+                        {
+                            User = user,
+                            Content = "Sie wurden zum Haushalt " + household.HouseholdName +" hinzugefügt.",
+                            Seen = false,
+                        },
+                        _context);
+                        await notificationHelper.CreateNotification();
+
                         return Ok(user);
                     }
                     else

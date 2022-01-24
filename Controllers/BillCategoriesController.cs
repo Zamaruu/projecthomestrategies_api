@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using HomeStrategiesApi.Helper;
 using HomeStrategiesApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using HomeStrategiesApi.Auth;
+using System.Security.Claims;
 
 namespace projecthomestrategies_api.Controllers
 {
@@ -44,14 +46,14 @@ namespace projecthomestrategies_api.Controllers
             return billCategory;
         }
 
-        [HttpGet("forHousehold/{householdId}")]
+        [HttpGet("ForHousehold/{householdId}")]
         public IActionResult GetBillCategoryForHousehold(int householdId)
         {
             var billCategories =  _context.BillCategories
                                     .Where(bc => bc.Household.HouseholdId.Equals(householdId))
                                     .ToList();
 
-            if (billCategories == null || billCategories.Count.Equals(0))
+            if (billCategories == null)
             {
                 return NotFound();
             }
@@ -93,13 +95,34 @@ namespace projecthomestrategies_api.Controllers
         // POST: api/BillCategories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<BillCategory>> PostBillCategory(BillCategory billCategory, int householdId)
+        public async Task<IActionResult> PostBillCategory(BillCategory billCategory)
         {
-            billCategory.Household = await _context.Households.FindAsync(householdId);
-            _context.BillCategories.Add(billCategory);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var household = await _context.Households.FindAsync(billCategory.Household.HouseholdId);
+                var newCategory = new BillCategory
+                {
+                    BillCategoryName = billCategory.BillCategoryName,
+                    Household = household,
+                };
 
-            return CreatedAtAction("GetBillCategory", new { id = billCategory.BillCategoryId }, billCategory);
+                var authHelper = new AuthenticationClaimsHelper(HttpContext.User.Identity as ClaimsIdentity);
+                if (!authHelper.IsAuthenticatedForHousehold(billCategory.Household.HouseholdId))
+                {
+                    return Unauthorized("Benutzer ist nicht autorisiert für einen anderen Haushalt Kategorien anzulegen!");
+                }
+
+                _context.BillCategories.Add(newCategory);
+                await _context.SaveChangesAsync();
+
+                return Ok(billCategory);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.ToString());
+                //return StatusCode(500, "Ein Fehler bei der Anfragebearbeitung ist aufgetreten!");
+            }
+
         }
 
         // DELETE: api/BillCategories/5
