@@ -76,6 +76,7 @@ namespace projecthomestrategies_api.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return Ok(billCategory);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -88,8 +89,6 @@ namespace projecthomestrategies_api.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
         }
 
         // POST: api/BillCategories
@@ -115,7 +114,7 @@ namespace projecthomestrategies_api.Controllers
                 _context.BillCategories.Add(newCategory);
                 await _context.SaveChangesAsync();
 
-                return Ok(billCategory);
+                return Ok(newCategory);
             }
             catch (Exception e)
             {
@@ -129,16 +128,23 @@ namespace projecthomestrategies_api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBillCategory(int id)
         {
-            var billCategory = await _context.BillCategories.FindAsync(id);
+            var bills = _context.Bills.Where(b => b.Category.BillCategoryId.Equals(id));
+                
+            if(bills.Any())
+            {
+                return BadRequest("Kategorie kann nicht gelöscht werden da sie noch in Rechnungen verwendet wird.");
+            }
+
+            var billCategory = _context.BillCategories.Find(id);
             if (billCategory == null)
             {
-                return NotFound();
+                return NotFound("Die zu löschende Kategorie wurde nicht gefunden");
             }
 
             _context.BillCategories.Remove(billCategory);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok("Kategorie wurde gelöscht");
         }
 
         private bool BillCategoryExists(int id)

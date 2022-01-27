@@ -27,24 +27,32 @@ namespace projecthomestrategies_api.Controllers
         [HttpGet("{householdId}")]
         public async Task<ActionResult<IEnumerable<Bill>>> GetBills(int householdId)
         {
-            return await _context.Bills
+            var bills = await _context.Bills
+                            .Include(bl => bl.Category)
+                            .Include(bl => bl.Buyer)
+                            .Include(bl => bl.Household)
                             .Where(bls => bls.Household.HouseholdId.Equals(householdId))
                             .ToListAsync();
+
+            var soretedBills = bills.ToList();
+            soretedBills.Sort((x, y) => DateTime.Compare(x.Date, y.Date));
+
+            return bills;
         }
 
         // GET: api/Bills/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Bill>> GetBill(int id)
-        {
-            var bill = await _context.Bills.FindAsync(id);
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<Bill>> GetBill(int id)
+        //{
+        //    var bill = await _context.Bills.FindAsync(id);
 
-            if (bill == null)
-            {
-                return NotFound();
-            }
+        //    if (bill == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return bill;
-        }
+        //    return bill;
+        //}
 
         // PUT: api/Bills/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -80,13 +88,23 @@ namespace projecthomestrategies_api.Controllers
         // POST: api/Bills
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Bill>> PostBill(Bill bill, int householdId)
+        public async Task<IActionResult> PostBill(Bill bill)
         {
-            bill.Household = await _context.Households.FindAsync(householdId);
-            _context.Bills.Add(bill);
-            await _context.SaveChangesAsync();
+            try
+            {
+                bill.Household = await _context.Households.FindAsync(bill.Household.HouseholdId);
+                bill.Buyer = await _context.User.FindAsync(bill.Buyer.UserId);
+                bill.Category = await _context.BillCategories.FindAsync(bill.Category.BillCategoryId);
+                _context.Bills.Add(bill);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBill", new { id = bill.BillId }, bill);
+                return Ok(bill);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Es ist ein Serverfehler beim erstellen der Rechnung aufgetreten!");
+            }
+
         }
 
         // DELETE: api/Bills/5

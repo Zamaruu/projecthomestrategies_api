@@ -41,7 +41,7 @@ namespace projecthomestrategies_api.Controllers
                 var user = GetUserFromBase64Credential(credentials);
 
                 if (user == null)
-                    return Unauthorized("User not found");
+                    return Unauthorized("E-Mail oder Passwort sind nicht korrekt!");
 
                 Dictionary<string, dynamic> signInResult = new Dictionary<string, dynamic>();
                 signInResult.Add("user", user);
