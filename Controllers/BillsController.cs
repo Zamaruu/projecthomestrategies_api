@@ -64,11 +64,20 @@ namespace projecthomestrategies_api.Controllers
                 return BadRequest();
             }
 
+            var newCategory = await _context.BillCategories.FindAsync(bill.Category.BillCategoryId);
+            bill.Category = newCategory;
             _context.Entry(bill).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
+                var changedBill = await _context.Bills
+                                    .Include(b => b.Buyer)
+                                    .Include(b => b.Household)
+                                    .Include(b => b.Category)
+                                    .Where(b => b.BillId.Equals(id))
+                                    .FirstOrDefaultAsync();
+                return Ok(changedBill);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -81,8 +90,6 @@ namespace projecthomestrategies_api.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
         }
 
         // POST: api/Bills
@@ -114,13 +121,13 @@ namespace projecthomestrategies_api.Controllers
             var bill = await _context.Bills.FindAsync(id);
             if (bill == null)
             {
-                return NotFound();
+                return NotFound("Die Rechnung konnte nicht gefunden werden!");
             }
 
             _context.Bills.Remove(bill);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok("Rechnung wurde gelöscht.");
         }
 
         private bool BillExists(int id)

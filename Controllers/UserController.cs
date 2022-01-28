@@ -79,7 +79,7 @@ namespace HomeStrategiesApi.Controllers
 
             if (result == null)
             {
-                return NotFound();
+                return NotFound("Unbekannter Benutzer mit E-Mail: " + email);
             }
             else
             {

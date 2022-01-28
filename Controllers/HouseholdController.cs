@@ -85,6 +85,10 @@ namespace HomeStrategiesApi.Controllers
         {
             var user = _context.User.FirstOrDefault(u => u.Email.Equals(email));
 
+            if(user == null)
+            {
+                return NotFound("Unbekannter Benutzer mit E-Mail: " + email);
+            }
             try
             {
                 if (user.Household == null)
