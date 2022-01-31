@@ -1,4 +1,5 @@
-﻿using HomeStrategiesApi.Helper;
+﻿using HomeStrategiesApi.Auth;
+using HomeStrategiesApi.Helper;
 using HomeStrategiesApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace HomeStrategiesApi.Controllers
@@ -17,10 +19,12 @@ namespace HomeStrategiesApi.Controllers
     public class HouseholdController : ControllerBase
     {
         private HomeStrategiesContext _context;
+        private readonly INotificationService _notificationService;
 
-        public HouseholdController(HomeStrategiesContext context)
+        public HouseholdController(HomeStrategiesContext context, INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         [HttpGet("{id}")]
@@ -101,13 +105,15 @@ namespace HomeStrategiesApi.Controllers
                         _context.SaveChanges();
 
                         var notificationHelper = new NotificationHelper(
-                        new Notification
-                        {
-                            User = user,
-                            Content = "Sie wurden zum Haushalt " + household.HouseholdName +" hinzugefügt.",
-                            Seen = false,
-                        },
-                        _context);
+                            new Notification(
+                                "Sie wurden zum Haushalt " + household.HouseholdName + " hinzugefügt.",
+                                NotificationType.Created,
+                                user,
+                                await new AuthenticationClaimsHelper(HttpContext.User.Identity as ClaimsIdentity).GetUserNameFromClaims(_context)
+                            ),
+                            _context,
+                            _notificationService
+                        );
                         await notificationHelper.CreateNotification();
 
                         return Ok(user);

@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using HomeStrategiesApi.Helper;
 using HomeStrategiesApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using HomeStrategiesApi.Controllers;
+using HomeStrategiesApi.Auth;
+using System.Security.Claims;
 
 namespace projecthomestrategies_api.Controllers
 {
@@ -17,10 +20,12 @@ namespace projecthomestrategies_api.Controllers
     public class BillsController : ControllerBase
     {
         private readonly HomeStrategiesContext _context;
+        private readonly INotificationService _notificationService;
 
-        public BillsController(HomeStrategiesContext context)
+        public BillsController(HomeStrategiesContext context, INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         // GET: api/Bills
@@ -104,6 +109,17 @@ namespace projecthomestrategies_api.Controllers
                 bill.Category = await _context.BillCategories.FindAsync(bill.Category.BillCategoryId);
                 _context.Bills.Add(bill);
                 await _context.SaveChangesAsync();
+
+                var notificationHelper = new NotificationHelper(
+                    new Notification(
+                        "Es wurde eine neu Rechnung über " + bill.Amount.ToString("0.00") + " € erstellt.",
+                        NotificationType.Created,
+                        await new AuthenticationClaimsHelper(HttpContext.User.Identity as ClaimsIdentity).GetUserNameFromClaims(_context)
+                    ),
+                    _context,
+                    _notificationService
+                );
+                notificationHelper.CreateNotificationForHousehold(bill.Household.HouseholdId, bill.Buyer.UserId);
 
                 return Ok(bill);
             }

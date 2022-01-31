@@ -19,10 +19,12 @@ namespace HomeStrategiesApi.Controllers
     public class NotificationsController : ControllerBase
     {
         private readonly HomeStrategiesContext _context;
+        private readonly INotificationService _notificationService;
 
-        public NotificationsController(HomeStrategiesContext context)
+        public NotificationsController(HomeStrategiesContext context, INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         // GET: api/Notifications
@@ -44,7 +46,7 @@ namespace HomeStrategiesApi.Controllers
 
                 var result = new Dictionary<string, List<Notification>>();
                 result.Add("OpenNotfications", openNotifications);
-                result.Add("SeenNotifications", seenNotifications);
+                result.Add ("SeenNotifications", seenNotifications);
 
                 return Ok(result);
             }
@@ -64,7 +66,7 @@ namespace HomeStrategiesApi.Controllers
                                             .Where(n => n.User.UserId.Equals(userId) && n.Seen == false)
                                             .ToList();
 
-            return Ok(openNotifications.Count);
+            return Ok(openNotifications);
         }
 
 
@@ -77,7 +79,7 @@ namespace HomeStrategiesApi.Controllers
 
             if (notification == null)
             {
-                return BadRequest();
+                return BadRequest("Notification konnte nicht gefunden werden!");
             }
             else
             {
@@ -89,13 +91,13 @@ namespace HomeStrategiesApi.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok();
+                return Ok("Status erfolgreich geändert");
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!NotificationExists(id))
                 {
-                    return NotFound();
+                    return NotFound("Notification konnte nicht gefunden werden!");
                 }
                 else
                 {
@@ -109,7 +111,7 @@ namespace HomeStrategiesApi.Controllers
         [HttpPost]
         public async Task<IActionResult> PostNotification(Notification notification)
         {
-            var newNotification = await new NotificationHelper(notification, _context).CreateNotification();
+            var newNotification = await new NotificationHelper(notification, _context, _notificationService).CreateNotification();
             return Ok(newNotification);
         }
 
@@ -132,25 +134,6 @@ namespace HomeStrategiesApi.Controllers
         private bool NotificationExists(int id)
         {
             return _context.Notifications.Any(e => e.NotificationId == id);
-        }
-    }
-
-    public class NotificationHelper
-    {
-        public Notification Notification { get; set; }
-        private readonly HomeStrategiesContext _context;
-
-        public NotificationHelper(Notification notification, HomeStrategiesContext context)
-        {
-            Notification = notification;
-            _context = context;
-        }
-
-        public async Task<Notification> CreateNotification()
-        {
-            _context.Notifications.Add(Notification);
-            await _context.SaveChangesAsync();
-            return Notification;
         }
     }
 }

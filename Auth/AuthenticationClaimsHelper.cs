@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using HomeStrategiesApi.Helper;
+using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace HomeStrategiesApi.Auth
 {
@@ -49,6 +51,13 @@ namespace HomeStrategiesApi.Auth
         {
             var identityHouseholdId = GetHouseholdClaimFromUser();
             return householdId.Equals(identityHouseholdId);
+        }
+
+        public async Task<string> GetUserNameFromClaims(HomeStrategiesContext _context)
+        {
+            var userId = GetIdClaimFromUser();
+            var user = await _context.User.FindAsync(userId);
+            return user.Firstname + " " + user.Surname;
         }
     }
 }

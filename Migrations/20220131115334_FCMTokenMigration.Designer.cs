@@ -3,14 +3,16 @@ using System;
 using HomeStrategiesApi.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace projecthomestrategies_api.Migrations
 {
     [DbContext(typeof(HomeStrategiesContext))]
-    partial class HomeStrategiesContextModelSnapshot : ModelSnapshot
+    [Migration("20220131115334_FCMTokenMigration")]
+    partial class FCMTokenMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

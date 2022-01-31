@@ -59,6 +59,7 @@ namespace projecthomestrategies_api.Controllers
                 Email = registerModel.Email,
                 Password = registerModel.Password,
                 Firstname = registerModel.Firstname,
+                FcmToken = registerModel.FcmToken,
                 Surname = registerModel.Surname,
                 Type = UserType.Basic,
             };
@@ -128,6 +129,7 @@ namespace projecthomestrategies_api.Controllers
                                     Firstname = u.Firstname,
                                     Surname = u.Surname,
                                     Email = email,
+                                    FcmToken = u.FcmToken,
                                     UserColor = u.UserColor,
                                     Household = u.Household,
 

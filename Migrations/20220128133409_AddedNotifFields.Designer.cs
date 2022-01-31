@@ -3,14 +3,16 @@ using System;
 using HomeStrategiesApi.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace projecthomestrategies_api.Migrations
 {
     [DbContext(typeof(HomeStrategiesContext))]
-    partial class HomeStrategiesContextModelSnapshot : ModelSnapshot
+    [Migration("20220128133409_AddedNotifFields")]
+    partial class AddedNotifFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,9 +128,6 @@ namespace projecthomestrategies_api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FcmToken")
                         .HasColumnType("text");
 
                     b.Property<string>("Firstname")

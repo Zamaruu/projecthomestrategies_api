@@ -18,8 +18,10 @@ using projecthomestrategies_api.Helper;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using CorePush.Google;
+using CorePush.Apple;
 
-namespace projecthomestrategies_api
+namespace HomeStrategiesApi
 {
     public class Startup
     {
@@ -35,7 +37,16 @@ namespace projecthomestrategies_api
         {
 
             services.AddControllers();
-            
+
+            //Fcm Configuration
+            services.AddTransient<INotificationService, NotificationService>();
+            services.AddHttpClient<FcmSender>();
+            services.AddHttpClient<ApnSender>();
+
+            var appSettingsSection = Configuration.GetSection("FcmNotification");
+            services.Configure<FcmNotificationSetting>(appSettingsSection);
+
+
             services.AddDbContext<HomeStrategiesContext>(options => options.UseMySQL(Configuration.GetConnectionString("MySQLConnectionString")));
 
             //Allow reference looping
