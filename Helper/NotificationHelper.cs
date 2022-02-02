@@ -55,7 +55,8 @@ namespace HomeStrategiesApi.Helper
             {
                   DeviceId = devideId,
                   IsAndroiodDevice = true,
-                  Title = "Neue Benachrichtigung",
+                  Data = Notification.FirebaseNotificationData,
+                  Title = Notification.Title,
                   Body = Notification.Content,
             };
 

@@ -106,6 +106,7 @@ namespace HomeStrategiesApi.Controllers
 
                         var notificationHelper = new NotificationHelper(
                             new Notification(
+                                "Haushalts-Änderung",
                                 "Sie wurden zum Haushalt " + household.HouseholdName + " hinzugefügt.",
                                 NotificationType.Created,
                                 user,

@@ -104,18 +104,29 @@ namespace projecthomestrategies_api.Controllers
         {
             try
             {
+                //Database operations
                 bill.Household = await _context.Households.FindAsync(bill.Household.HouseholdId);
                 bill.Buyer = await _context.User.FindAsync(bill.Buyer.UserId);
                 bill.Category = await _context.BillCategories.FindAsync(bill.Category.BillCategoryId);
                 _context.Bills.Add(bill);
                 await _context.SaveChangesAsync();
 
+                //Notification operations
+                var notification = new Notification
+                {
+                    Title = "Neue Rechnung",
+                    Content = bill.Buyer.Firstname + " hat eine neu Rechnung über " + bill.Amount.ToString("0.00") + " € erstellt.",
+                    Type = NotificationType.Created,
+                    Created = DateTime.UtcNow,
+                    CreatorName = await new AuthenticationClaimsHelper(HttpContext.User.Identity as ClaimsIdentity).GetUserNameFromClaims(_context),
+                    FirebaseNotificationData = new FirebaseNotificationData
+                    {
+                        Route = NotificationRoute.Bills,
+                    }
+                };
+      
                 var notificationHelper = new NotificationHelper(
-                    new Notification(
-                        "Es wurde eine neu Rechnung über " + bill.Amount.ToString("0.00") + " € erstellt.",
-                        NotificationType.Created,
-                        await new AuthenticationClaimsHelper(HttpContext.User.Identity as ClaimsIdentity).GetUserNameFromClaims(_context)
-                    ),
+                    notification,
                     _context,
                     _notificationService
                 );

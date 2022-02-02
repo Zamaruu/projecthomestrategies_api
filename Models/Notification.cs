@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,12 +17,17 @@ namespace HomeStrategiesApi.Models
     public class Notification
     {
         public int NotificationId { get; set; }
+        public string Title { get; set; }
         public string Content { get; set; }
         public bool Seen { get; set; }
         public string CreatorName { get; set; }
         public DateTime Created { get; set; }
         public NotificationType Type { get; set; }
         public User User { get; set; }
+        
+        //Non database objects
+        [NotMapped]
+        public FirebaseNotificationData FirebaseNotificationData { get; set; }
 
         public Notification() { }
 
@@ -31,8 +37,9 @@ namespace HomeStrategiesApi.Models
         /// <param name="content"></param>
         /// <param name="type"></param>
         /// <param name="user"></param>
-        public Notification(string content, NotificationType type, User user, string creator)
+        public Notification(string title, string content, NotificationType type, User user, string creator)
         {
+            Title = title;
             Content = content;
             Seen = false;
             CreatorName = creator;
@@ -41,8 +48,9 @@ namespace HomeStrategiesApi.Models
             User = user;
         }
 
-        public Notification(string content, NotificationType type, string creator)
+        public Notification(string title, string content, NotificationType type, string creator)
         {
+            Title = title;
             Content = content;
             Seen = false;
             CreatorName = creator;
