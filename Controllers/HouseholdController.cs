@@ -71,6 +71,7 @@ namespace HomeStrategiesApi.Controllers
         {
             try
             {
+                household.CreatedAt = DateTime.UtcNow;
                 _context.Households.Add(household);
                 _context.SaveChanges();
 

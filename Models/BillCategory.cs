@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HomeStrategiesApi.Models
@@ -8,5 +9,6 @@ namespace HomeStrategiesApi.Models
         public int BillCategoryId { get; set; }
         public string BillCategoryName { get; set; }
         public Household Household { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

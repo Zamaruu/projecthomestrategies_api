@@ -108,6 +108,7 @@ namespace projecthomestrategies_api.Controllers
                 bill.Household = await _context.Households.FindAsync(bill.Household.HouseholdId);
                 bill.Buyer = await _context.User.FindAsync(bill.Buyer.UserId);
                 bill.Category = await _context.BillCategories.FindAsync(bill.Category.BillCategoryId);
+                bill.CreatedAt = DateTime.UtcNow;
                 _context.Bills.Add(bill);
                 await _context.SaveChangesAsync();
 

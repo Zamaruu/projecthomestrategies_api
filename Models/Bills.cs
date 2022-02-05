@@ -12,5 +12,6 @@ namespace HomeStrategiesApi.Models
         public User Buyer { get; set; }
         public Household Household { get; set; }
         public BillCategory Category { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

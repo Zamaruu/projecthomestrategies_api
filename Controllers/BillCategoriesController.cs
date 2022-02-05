@@ -103,6 +103,7 @@ namespace projecthomestrategies_api.Controllers
                 {
                     BillCategoryName = billCategory.BillCategoryName,
                     Household = household,
+                    CreatedAt = DateTime.UtcNow,
                 };
 
                 var authHelper = new AuthenticationClaimsHelper(HttpContext.User.Identity as ClaimsIdentity);

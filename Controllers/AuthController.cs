@@ -61,6 +61,7 @@ namespace projecthomestrategies_api.Controllers
                 Firstname = registerModel.Firstname,
                 FcmToken = registerModel.FcmToken,
                 Surname = registerModel.Surname,
+                CreatedAt = DateTime.UtcNow,
                 Type = UserType.Basic,
             };
 
@@ -92,6 +93,7 @@ namespace projecthomestrategies_api.Controllers
                 Password = registerModel.Password,
                 Firstname = registerModel.Firstname,
                 Surname = registerModel.Surname,
+                CreatedAt = DateTime.UtcNow,
                 Type = UserType.Admin,
             };
 
