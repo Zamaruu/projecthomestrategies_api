@@ -79,7 +79,7 @@ namespace HomeStrategiesApi.Controllers
 
             if (notification == null)
             {
-                return BadRequest("Notification konnte nicht gefunden werden!");
+                return BadRequest("Benachrichtigung konnte nicht gefunden werden!");
             }
             else
             {
@@ -97,7 +97,7 @@ namespace HomeStrategiesApi.Controllers
             {
                 if (!NotificationExists(id))
                 {
-                    return NotFound("Notification konnte nicht gefunden werden!");
+                    return NotFound("Benachrichtigung konnte nicht gefunden werden!");
                 }
                 else
                 {
@@ -105,6 +105,44 @@ namespace HomeStrategiesApi.Controllers
                 }
             }
         }
+
+        [HttpPut("SetAllSeen")]
+        public async Task<IActionResult> PutAllOnSeen(List<int> notificationIds)
+        {
+            foreach (int id in notificationIds)
+            {
+                var notification = await _context.Notifications.FindAsync(id);
+
+                if (notification == null)
+                {
+                    return BadRequest("Benachrichtigung konnte nicht gefunden werden!");
+                }
+                else
+                {
+                    notification.Seen = true;
+                    _context.Entry(notification).State = EntityState.Modified;
+                }
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok("Status aller Benachrichtigungen erfolgreich geändert");
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!NotificationsExist(notificationIds))
+                {
+                    return NotFound("Benachrichtigungen konnten nicht gefunden werden!");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+
 
         // POST: api/Notifications
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -134,6 +172,19 @@ namespace HomeStrategiesApi.Controllers
         private bool NotificationExists(int id)
         {
             return _context.Notifications.Any(e => e.NotificationId == id);
+        }
+
+        private bool NotificationsExist(List<int> ids)
+        {
+            foreach (int id in ids)
+            {
+                bool exists = _context.Notifications.Any(e => e.NotificationId == id);
+                if (!exists)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

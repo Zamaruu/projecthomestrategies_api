@@ -1,5 +1,6 @@
 ﻿using HomeStrategiesApi.Helper;
 using HomeStrategiesApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ using System.Threading.Tasks;
 
 namespace projecthomestrategies_api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
@@ -29,6 +31,7 @@ namespace projecthomestrategies_api.Controllers
             _jwtSettings = jwtSettings.Value;
         }
 
+        [AllowAnonymous]
         [HttpPost("signin/{credentials}")]
         public IActionResult SignIn(string credentials)
         {
@@ -51,6 +54,7 @@ namespace projecthomestrategies_api.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("signup/basic")]
         public IActionResult SignUpBasic([FromBody]RegisterModel registerModel)
         {
@@ -84,6 +88,7 @@ namespace projecthomestrategies_api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("signup/admin")]
         public IActionResult SignUpAdmin([FromBody] RegisterModel registerModel)
         {
@@ -163,6 +168,7 @@ namespace projecthomestrategies_api.Controllers
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Email),
+                    new Claim(ClaimTypes.Role, user.Type.ToString()),
                     new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                     new Claim(ClaimTypes.GroupSid, user.Household != null ? user.Household.HouseholdId.ToString() : string.Empty)
                 }),
