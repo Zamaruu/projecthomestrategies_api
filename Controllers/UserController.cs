@@ -10,6 +10,8 @@ using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using HomeStrategiesApi.Auth;
+using System.ComponentModel.DataAnnotations;
 
 namespace HomeStrategiesApi.Controllers
 {
@@ -27,11 +29,12 @@ namespace HomeStrategiesApi.Controllers
             _context = context;
         }
 
-        //[HttpGet]
-        //public IActionResult Get()
-        //{
-        //    return Ok(_context.User);
-        //}
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok(_context.User);
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id, bool includeDetails = false)
@@ -111,21 +114,30 @@ namespace HomeStrategiesApi.Controllers
         //    }
         //}
 
-        [HttpPut("{id}")]
+        [HttpPut("Color")]
         [Consumes("application/json")]
-        public IActionResult Put(int id, [FromBody] User newValues)
+        public IActionResult Put([Required] int userId, [Required] long color)
         {
-            var user = _context.User.FirstOrDefault(s => s.UserId == id);
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var jwtId = new AuthenticationClaimsHelper(identity).GetIdClaimFromUser();
+
+            if(!userId.Equals(jwtId))
+            {
+                return Unauthorized("Sie können nur Ihre eigenen Daten bearbeiten!");
+            }
+
+            var user = _context.User.FirstOrDefault(s => s.UserId == userId);
             if (user != null)
             {
-                _context.Entry(user).CurrentValues.SetValues(newValues);
+                user.UserColor = color;
+                _context.Entry(user).CurrentValues.SetValues(user);
                 _context.SaveChanges();
 
-                return Ok(_context.User.FirstOrDefault(s => s.UserId == id));
+                return Ok(_context.User.FirstOrDefault(s => s.UserId == userId));
             }
             else
             {
-                return NotFound();
+                return NotFound("Benutzer mit der ID konnte nicht gefunden werden!");
             }
         }
 

@@ -19,7 +19,8 @@ namespace HomeStrategiesApi.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public string FcmToken { get; set; }
-        public int UserColor { get; set; }
+        public long UserColor { get; set; }
+        public String Image { get; set; }
         public UserType Type { get; set; }
         
         public DateTime CreatedAt { get; set; }

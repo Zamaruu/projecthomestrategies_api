@@ -64,6 +64,8 @@ namespace projecthomestrategies_api.Controllers
                 Password = registerModel.Password,
                 Firstname = registerModel.Firstname,
                 FcmToken = registerModel.FcmToken,
+                Image = string.Empty,
+                UserColor = GenerateRandomMaterialColor(),
                 Surname = registerModel.Surname,
                 CreatedAt = DateTime.UtcNow,
                 Type = UserType.Basic,
@@ -97,6 +99,8 @@ namespace projecthomestrategies_api.Controllers
                 Email = registerModel.Email,
                 Password = registerModel.Password,
                 Firstname = registerModel.Firstname,
+                UserColor = GenerateRandomMaterialColor(),
+                Image = string.Empty,
                 Surname = registerModel.Surname,
                 CreatedAt = DateTime.UtcNow,
                 Type = UserType.Admin,
@@ -136,10 +140,11 @@ namespace projecthomestrategies_api.Controllers
                                     Firstname = u.Firstname,
                                     Surname = u.Surname,
                                     Email = email,
+                                    Image = u.Image,
+                                    Type = u.Type,
                                     FcmToken = u.FcmToken,
                                     UserColor = u.UserColor,
                                     Household = u.Household,
-
                                 })
                                 .FirstOrDefault();
 
@@ -190,6 +195,21 @@ namespace projecthomestrategies_api.Controllers
                 return true;
             }
             return false;
+        }
+    
+        private long GenerateRandomMaterialColor()
+        {
+            var random = new Random();
+            return LongRandom(1111111111, 9999999999, random);
+        }
+
+        private long LongRandom(long min, long max, Random rand)
+        {
+            byte[] buf = new byte[8];
+            rand.NextBytes(buf);
+            long longRand = BitConverter.ToInt64(buf, 0);
+
+            return (Math.Abs(longRand % (max - min)) + min);
         }
     }
 }

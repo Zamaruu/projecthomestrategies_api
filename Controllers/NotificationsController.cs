@@ -169,6 +169,33 @@ namespace HomeStrategiesApi.Controllers
             return NoContent();
         }
 
+        [HttpDelete("All")]
+        public async Task<IActionResult> DeleteAllNotifications()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var userId = new AuthenticationClaimsHelper(identity).GetIdClaimFromUser();
+
+            if(userId > 0)
+            {
+                var notifications = await _context.Notifications.Where(n => n.User.UserId.Equals(userId)).ToListAsync();
+                if (notifications == null)
+                {
+                    return NotFound("Benachrichtigungen konnten nicht gefunden werden!");
+                }
+                foreach (var n in notifications)
+                {
+                    _context.Notifications.Remove(n);
+                }
+                await _context.SaveChangesAsync();
+
+                return Ok("Alle Becharichtigungen gelöscht");
+            }
+            else
+            {
+                return BadRequest("Benutzer ID nicht bekannt!");
+            }
+        }
+
         private bool NotificationExists(int id)
         {
             return _context.Notifications.Any(e => e.NotificationId == id);

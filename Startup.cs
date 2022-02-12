@@ -96,6 +96,12 @@ namespace HomeStrategiesApi
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "projecthomestrategies_api v1"));
             }
+            //else // Production
+            //{
+            //    app.UseExceptionHandler("/Error");
+            //    // Remove to use HTTP only
+            //    app.UseHsts(); // HTTPS Strict mode
+            //}
 
             //app.UseHttpsRedirection();
 

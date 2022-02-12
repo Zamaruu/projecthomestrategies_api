@@ -3,14 +3,16 @@ using System;
 using HomeStrategiesApi.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace projecthomestrategies_api.Migrations
 {
     [DbContext(typeof(HomeStrategiesContext))]
-    partial class HomeStrategiesContextModelSnapshot : ModelSnapshot
+    [Migration("20220207112550_UserImageMigration")]
+    partial class UserImageMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,8 +166,8 @@ namespace projecthomestrategies_api.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<long>("UserColor")
-                        .HasColumnType("bigint");
+                    b.Property<int>("UserColor")
+                        .HasColumnType("int");
 
                     b.HasKey("UserId");
 
