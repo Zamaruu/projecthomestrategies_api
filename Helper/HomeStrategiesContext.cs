@@ -9,6 +9,7 @@ namespace HomeStrategiesApi.Helper
         public DbSet<User> User { get; set; }
         public DbSet<Household> Households { get; set; }
         public DbSet<Bill> Bills { get; set; }
+        public DbSet<BillImage> BillImages { get; set; }
         public DbSet<BillCategory> BillCategories { get; set; }
         public DbSet<Notification> Notifications { get; set; }
 

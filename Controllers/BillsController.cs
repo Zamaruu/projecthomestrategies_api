@@ -36,6 +36,7 @@ namespace projecthomestrategies_api.Controllers
                             .Include(bl => bl.Category)
                             .Include(bl => bl.Buyer)
                             .Include(bl => bl.Household)
+                            .Include(bl => bl.Images)
                             .Where(bls => bls.Household.HouseholdId.Equals(householdId))
                             .ToListAsync();
 
@@ -109,14 +110,26 @@ namespace projecthomestrategies_api.Controllers
                 bill.Buyer = await _context.User.FindAsync(bill.Buyer.UserId);
                 bill.Category = await _context.BillCategories.FindAsync(bill.Category.BillCategoryId);
                 bill.CreatedAt = DateTime.UtcNow;
-                _context.Bills.Add(bill);
+
+                var createBill = new Bill {
+                    Amount = bill.Amount,
+                    Description = bill.Description,
+                    Date = bill.Date,
+                    Household = await _context.Households.FindAsync(bill.Household.HouseholdId),
+                    Buyer = await _context.User.FindAsync(bill.Buyer.UserId),
+                    Images = bill.Images,
+                    Category = await _context.BillCategories.FindAsync(bill.Category.BillCategoryId),
+                    CreatedAt = DateTime.UtcNow,
+                };
+
+                _context.Bills.Add(createBill);
                 await _context.SaveChangesAsync();
 
                 //Notification operations
                 var notification = new Notification
                 {
                     Title = "Neue Rechnung",
-                    Content = bill.Buyer.Firstname + " hat eine neu Rechnung über " + bill.Amount.ToString("0.00") + " € erstellt.",
+                    Content = bill.Buyer.Firstname + " hat eine neu Rechnung über " + createBill.Amount.ToString("0.00") + " € erstellt.",
                     Type = NotificationType.Created,
                     Created = DateTime.UtcNow,
                     CreatorName = await new AuthenticationClaimsHelper(HttpContext.User.Identity as ClaimsIdentity).GetUserNameFromClaims(_context),
@@ -131,9 +144,10 @@ namespace projecthomestrategies_api.Controllers
                     _context,
                     _notificationService
                 );
-                notificationHelper.CreateNotificationForHousehold(bill.Household.HouseholdId, bill.Buyer.UserId);
+                notificationHelper.CreateNotificationForHousehold(createBill.Household.HouseholdId, createBill.Buyer.UserId);
 
-                return Ok(bill);
+                //Returning
+                return Ok(createBill);
             }
             catch (Exception)
             {
