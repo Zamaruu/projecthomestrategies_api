@@ -36,7 +36,7 @@ namespace projecthomestrategies_api.Controllers
                             .Include(bl => bl.Category)
                             .Include(bl => bl.Buyer)
                             .Include(bl => bl.Household)
-                            .Include(bl => bl.Images)
+                            //.Include(bl => bl.Images) // IMPORTANT <- when this line is included, the first load time will be significantly higher. Recommended to load images when bill is selected
                             .Where(bls => bls.Household.HouseholdId.Equals(householdId))
                             .ToListAsync();
 
@@ -47,18 +47,38 @@ namespace projecthomestrategies_api.Controllers
         }
 
         // GET: api/Bills/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Bill>> GetBill(int id)
-        //{
-        //    var bill = await _context.Bills.FindAsync(id);
+        [HttpGet("Single/{id}")]
+        public async Task<ActionResult<Bill>> GetBill(int id, bool includeImages = false)
+        {
+            Bill bill;
 
-        //    if (bill == null)
-        //    {
-        //        return NotFound();
-        //    }
+            if (includeImages)
+            {
+                bill = await _context.Bills
+                    .Include(bl => bl.Category)
+                    .Include(bl => bl.Buyer)
+                    .Include(bl => bl.Household)
+                    .Include(bl => bl.Images) // IMPORTANT <- when this line is included, the first load time will be significantly higher. Recommended to load images when bill is selected
+                    .Where(bls => bls.BillId.Equals(id))
+                    .FirstAsync();
+            }
+            else
+            {
+                bill = await _context.Bills
+                    .Include(bl => bl.Category)
+                    .Include(bl => bl.Buyer)
+                    .Include(bl => bl.Household)
+                    .Where(bls => bls.BillId.Equals(id))
+                    .FirstAsync();
+            }
 
-        //    return bill;
-        //}
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
+            return bill;
+        }
 
         // PUT: api/Bills/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -72,6 +92,9 @@ namespace projecthomestrategies_api.Controllers
 
             var newCategory = await _context.BillCategories.FindAsync(bill.Category.BillCategoryId);
             bill.Category = newCategory;
+
+            await HandleEditImage(bill.Images);
+
             _context.Entry(bill).State = EntityState.Modified;
 
             try
@@ -81,6 +104,7 @@ namespace projecthomestrategies_api.Controllers
                                     .Include(b => b.Buyer)
                                     .Include(b => b.Household)
                                     .Include(b => b.Category)
+                                    .Include(b => b.Images)
                                     .Where(b => b.BillId.Equals(id))
                                     .FirstOrDefaultAsync();
                 return Ok(changedBill);
@@ -172,9 +196,55 @@ namespace projecthomestrategies_api.Controllers
             return Ok("Rechnung wurde gelöscht.");
         }
 
+        [HttpDelete("Images")]
+        public async Task<IActionResult> DeleteBillImages(List<int> imageIds)
+        {
+            if (imageIds == null || imageIds.Count < 1)
+            {
+                return BadRequest("Es gab Fehler bei der Übertragung der Ids");
+            }
+
+            try
+            {
+                BillImage deleteImage; 
+
+                foreach (var id in imageIds)
+                {
+                    deleteImage = await _context.BillImages.FindAsync(id);
+                    _context.BillImages.Remove(deleteImage);
+                }
+
+                await _context.SaveChangesAsync();
+                return Ok("Bilder erfolgreich gelöscht!");
+            }
+            catch
+            {
+                return BadRequest("Fehler beim löschen der Bilder!");
+            }
+
+        }
+
+        private async Task HandleEditImage(List<BillImage> images)
+        {
+            foreach (var image in images)
+            {
+                if (!BillImageExists(image.BillImageId))
+                {
+                    _context.BillImages.Add(image);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         private bool BillExists(int id)
         {
             return _context.Bills.Any(e => e.BillId == id);
+        }
+
+        private bool BillImageExists(int id)
+        {
+            return _context.BillImages.Any(e => e.BillImageId == id);
         }
     }
 }
