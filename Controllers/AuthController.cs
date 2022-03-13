@@ -31,6 +31,12 @@ namespace projecthomestrategies_api.Controllers
             _jwtSettings = jwtSettings.Value;
         }
 
+        [HttpPost("CheckToken")]
+        public IActionResult CheckToken()
+        {
+            return Ok("Accesstoken ist noch in");
+        }
+
         [AllowAnonymous]
         [HttpPost("signin/{credentials}")]
         public IActionResult SignIn(string credentials)

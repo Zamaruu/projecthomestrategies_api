@@ -46,6 +46,25 @@ namespace projecthomestrategies_api.Controllers
             return bills;
         }
 
+        [HttpGet("Paged/{householdId}")]
+        public async Task<ActionResult<IEnumerable<Bill>>> GetBillsPaged(int householdId, int pageNumber = 1, int pageSize = 50)
+        {
+            var bills = await _context.Bills
+                            .Include(bl => bl.Category)
+                            .Include(bl => bl.Buyer)
+                            .Include(bl => bl.Household)
+                            //.Include(bl => bl.Images) // IMPORTANT <- when this line is included, the first load time will be significantly higher. Recommended to load images when bill is selected
+                            .Where(bls => bls.Household.HouseholdId.Equals(householdId))
+                            .Skip((pageNumber - 1) * 50)
+                            .Take(pageSize)
+                            .ToListAsync();
+
+            var soretedBills = bills.ToList();
+            soretedBills.Sort((x, y) => DateTime.Compare(x.Date, y.Date));
+
+            return bills;
+        }
+
         // GET: api/Bills/5
         [HttpGet("Single/{id}")]
         public async Task<ActionResult<Bill>> GetBill(int id, bool includeImages = false)

@@ -36,6 +36,18 @@ namespace HomeStrategiesApi
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:60648")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+                    });
+            });
+
             services.AddControllers();
 
             //Fcm Configuration
@@ -92,6 +104,7 @@ namespace HomeStrategiesApi
         {
             if (env.IsDevelopment())
             {
+                app.UseCors("AllowAll");
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "projecthomestrategies_api v1"));
