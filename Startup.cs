@@ -20,6 +20,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using CorePush.Google;
 using CorePush.Apple;
+using HomeStrategiesApi.MongoDB;
+using Microsoft.Extensions.Options;
 
 namespace HomeStrategiesApi
 {
@@ -35,7 +37,8 @@ namespace HomeStrategiesApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            // ----------------------------------------------------------------------------------------
+            // Cors policy for Dev Enviroment
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
@@ -50,7 +53,9 @@ namespace HomeStrategiesApi
 
             services.AddControllers();
 
-            //Fcm Configuration
+            // ----------------------------------------------------------------------------------------
+
+            // Fcm Configuration
             services.AddTransient<INotificationService, NotificationService>();
             services.AddHttpClient<FcmSender>();
             services.AddHttpClient<ApnSender>();
@@ -58,13 +63,26 @@ namespace HomeStrategiesApi
             var appSettingsSection = Configuration.GetSection("FcmNotification");
             services.Configure<FcmNotificationSetting>(appSettingsSection);
 
-
+            // ----------------------------------------------------------------------------------------
+            
+            // Database Initialization
+            // MySQL
             services.AddDbContext<HomeStrategiesContext>(options => options.UseMySQL(Configuration.GetConnectionString("MySQLConnectionString")));
+            
+            //MongoDB
+            var mongoSettings = Configuration.GetSection("MongoDBSettings");
+            services.Configure<MongoConnectionSettings>(mongoSettings);
+            services.AddSingleton<IMongoConnectionSettings>(sp => sp.GetRequiredService<IOptions<MongoConnectionSettings>>().Value);
+            services.AddSingleton<MongoServiceClient>();
 
+            // ----------------------------------------------------------------------------------------
+            
             //Allow reference looping
             services.AddMvc(option => option.EnableEndpointRouting = false)
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+
+            // ----------------------------------------------------------------------------------------
 
             //JWT settings injection
             var jwtSettings = Configuration.GetSection("JWTSettings");
@@ -93,9 +111,11 @@ namespace HomeStrategiesApi
                 };
             });
 
+            // ----------------------------------------------------------------------------------------
+
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "projecthomestrategies_api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "HomeStrategies API", Version = "v1" });
             });
         }
 

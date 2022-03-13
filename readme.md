@@ -1,3 +1,9 @@
+## Setup procedure for MongoDB in Docker
+1. Install and run with:
+docker run -d  --name backend_mongodb  -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=mongoadmin -e MONGO_INITDB_ROOT_PASSWORD=secret
+2. Connect to MongoDB with:
+mongodb://mongoadmin:secret@localhost:27017
+
 ## Deployment description for "Home Strategies" API
 
 1. Create the project in Visul Studio -> Create -> projecthomestrategies_api
