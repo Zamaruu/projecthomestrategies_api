@@ -8,7 +8,9 @@ namespace HomeStrategiesApi.Models.MongoDB
         public string Id { get; set; }
         public int HouseholdId { get; set; }
         public int CreatorId { get; set; }
+        public string Name { get; set; }
         public string Desctiption { get; set; }
+        public string DisplayImage { get; set; }
         public int CookingTime { get; set; }
         public bool MakePublic { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -24,7 +26,9 @@ namespace HomeStrategiesApi.Models.MongoDB
             Id = Guid.NewGuid().ToString();
             HouseholdId = newRecipe.HouseholdId;
             CreatorId = newRecipe.CreatorId;
+            Name = newRecipe.Name;
             Desctiption = newRecipe.Desctiption;
+            DisplayImage = newRecipe.DisplayImage;
             CookingTime = newRecipe.CookingTime;
             MakePublic = newRecipe.MakePublic;
             CreatedAt = DateTime.UtcNow;

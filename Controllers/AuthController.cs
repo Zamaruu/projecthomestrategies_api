@@ -15,7 +15,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace projecthomestrategies_api.Controllers
+namespace HomeStrategiesApi.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]

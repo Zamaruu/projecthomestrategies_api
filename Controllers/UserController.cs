@@ -21,7 +21,9 @@ namespace HomeStrategiesApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
-        private HomeStrategiesContext _context;
+        private readonly HomeStrategiesContext _context;
+
+        public UserController() { }
 
         public UserController(ILogger<UserController> logger, HomeStrategiesContext context)
         {
@@ -96,23 +98,6 @@ namespace HomeStrategiesApi.Controllers
                 }
             }
         }
-
-        //[HttpPost("basic")]
-        //[Consumes("application/json")]
-        //public IActionResult Post([FromBody]User user){
-        //    try
-        //    {
-        //        user.Type = UserType.Basic;
-        //        _context.User.Add(user);
-        //        _context.SaveChanges();
-        //        return Ok();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return BadRequest(e);
-        //        throw;
-        //    }
-        //}
 
         [HttpPut("Color")]
         [Consumes("application/json")]

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using HomeStrategiesApi.Auth;
 using System.Security.Claims;
 
-namespace projecthomestrategies_api.Controllers
+namespace HomeStrategiesApi.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]

@@ -1,4 +1,5 @@
 ﻿using HomeStrategiesApi.Models;
+using HomeStrategiesApi.Models.MongoDB;
 using Microsoft.EntityFrameworkCore;
 using MySql.EntityFrameworkCore.Extensions;
 
@@ -12,6 +13,7 @@ namespace HomeStrategiesApi.Helper
         public DbSet<BillImage> BillImages { get; set; }
         public DbSet<BillCategory> BillCategories { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<RecipeFavourite> RecipeFavourites { get; set; }
 
         public HomeStrategiesContext(DbContextOptions<HomeStrategiesContext> options) : base(options)
         {
@@ -24,7 +26,7 @@ namespace HomeStrategiesApi.Helper
                .HasOne(h => h.HouseholdCreator)
                .WithOne(u => u.AdminOfHousehold)
                .HasForeignKey<Household>(h => h.AdminId);
-
+                
             //modelBuilder.Entity<Household>()
             //    .HasMany(h => h.householdeMember)
             //    .WithOne(u => u.household);

@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace projecthomestrategies_api.Migrations
 {
     [DbContext(typeof(HomeStrategiesContext))]
-    [Migration("20220227182833_BillImageMigration")]
-    partial class BillImageMigration
+    [Migration("20220315104310_RecipeFavouriteMigration")]
+    partial class RecipeFavouriteMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -119,6 +119,25 @@ namespace projecthomestrategies_api.Migrations
                         .IsUnique();
 
                     b.ToTable("Households");
+                });
+
+            modelBuilder.Entity("HomeStrategiesApi.Models.MongoDB.RecipeFavourite", b =>
+                {
+                    b.Property<int>("RecipeFavouriteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("RecipeId")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RecipeFavouriteId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RecipeFavourites");
                 });
 
             modelBuilder.Entity("HomeStrategiesApi.Models.Notification", b =>
@@ -246,6 +265,15 @@ namespace projecthomestrategies_api.Migrations
                         .IsRequired();
 
                     b.Navigation("HouseholdCreator");
+                });
+
+            modelBuilder.Entity("HomeStrategiesApi.Models.MongoDB.RecipeFavourite", b =>
+                {
+                    b.HasOne("HomeStrategiesApi.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeStrategiesApi.Models.Notification", b =>

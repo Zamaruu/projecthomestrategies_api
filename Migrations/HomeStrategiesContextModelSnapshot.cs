@@ -119,6 +119,25 @@ namespace projecthomestrategies_api.Migrations
                     b.ToTable("Households");
                 });
 
+            modelBuilder.Entity("HomeStrategiesApi.Models.MongoDB.RecipeFavourite", b =>
+                {
+                    b.Property<int>("RecipeFavouriteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("RecipeId")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RecipeFavouriteId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RecipeFavourites");
+                });
+
             modelBuilder.Entity("HomeStrategiesApi.Models.Notification", b =>
                 {
                     b.Property<int>("NotificationId")
@@ -244,6 +263,15 @@ namespace projecthomestrategies_api.Migrations
                         .IsRequired();
 
                     b.Navigation("HouseholdCreator");
+                });
+
+            modelBuilder.Entity("HomeStrategiesApi.Models.MongoDB.RecipeFavourite", b =>
+                {
+                    b.HasOne("HomeStrategiesApi.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeStrategiesApi.Models.Notification", b =>

@@ -12,7 +12,7 @@ using HomeStrategiesApi.Controllers;
 using HomeStrategiesApi.Auth;
 using System.Security.Claims;
 
-namespace projecthomestrategies_api.Controllers
+namespace HomeStrategiesApi.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
@@ -53,14 +53,13 @@ namespace projecthomestrategies_api.Controllers
                             .Include(bl => bl.Category)
                             .Include(bl => bl.Buyer)
                             .Include(bl => bl.Household)
+                            .OrderByDescending(x => x.Date)
                             //.Include(bl => bl.Images) // IMPORTANT <- when this line is included, the first load time will be significantly higher. Recommended to load images when bill is selected
                             .Where(bls => bls.Household.HouseholdId.Equals(householdId))
-                            .Skip((pageNumber - 1) * 50)
+                            .Skip((pageNumber - 1) * pageSize)
                             .Take(pageSize)
                             .ToListAsync();
 
-            var soretedBills = bills.ToList();
-            soretedBills.Sort((x, y) => DateTime.Compare(x.Date, y.Date));
 
             return bills;
         }
