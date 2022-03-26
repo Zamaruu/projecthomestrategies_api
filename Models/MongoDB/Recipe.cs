@@ -14,6 +14,8 @@ namespace HomeStrategiesApi.Models.MongoDB
         public int CookingTime { get; set; }
         public bool MakePublic { get; set; }
         public DateTime CreatedAt { get; set; }
+        public List<string> Categories { get; set; }
+        public List<RecipeIngredient> Ingredients { get; set; }
         public List<CoockingStep> CookingSteps { get; set; }
 
         public Recipe() { }
@@ -33,6 +35,7 @@ namespace HomeStrategiesApi.Models.MongoDB
             MakePublic = newRecipe.MakePublic;
             CreatedAt = DateTime.UtcNow;
             CookingSteps = InitalizeCookingSteps(newRecipe.CookingSteps);
+            Ingredients = InitalizeIngredients(newRecipe.Ingredients);
         }
 
         private static List<CoockingStep> InitalizeCookingSteps(List<CoockingStep> newSteps)
@@ -45,6 +48,18 @@ namespace HomeStrategiesApi.Models.MongoDB
             }
 
             return steps;
+        }
+
+        private static List<RecipeIngredient> InitalizeIngredients(List<RecipeIngredient> newIngredients)
+        {
+            List<RecipeIngredient> ingredients = new();
+
+            foreach (var ingredient in newIngredients)
+            {
+                ingredients.Add(new RecipeIngredient(ingredient));
+            }
+
+            return ingredients;
         }
     }
 }

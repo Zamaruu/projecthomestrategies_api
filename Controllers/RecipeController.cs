@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 namespace HomeStrategiesApi.Controllers
 {
     [Authorize]
+    //[AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class RecipeController : ControllerBase
