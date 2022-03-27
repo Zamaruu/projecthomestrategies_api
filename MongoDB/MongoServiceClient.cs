@@ -35,10 +35,14 @@ namespace HomeStrategiesApi.MongoDB
         // ------------------------------------------------------------------------------------
         // Rezepte
 
-        public List<Recipe> GetPublicRecipes()
+        public List<Recipe> GetPublicRecipes(int page, int pageSize)
         {
             var collection = GetCollection<Recipe>(Collections.Recipes);
-            return collection.Find(recipe => recipe.MakePublic).ToList();
+            return collection
+                .Find(recipe => recipe.MakePublic)
+                .Skip((page - 1) * pageSize)
+                .Limit(pageSize)
+                .ToList();
         }
 
         public Recipe GetRecipe(string id)

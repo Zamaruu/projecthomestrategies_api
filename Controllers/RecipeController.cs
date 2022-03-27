@@ -66,9 +66,9 @@ namespace HomeStrategiesApi.Controllers
         }
 
         [HttpGet("Public")]
-        public IActionResult GetPublicRecipes()
+        public IActionResult GetPublicRecipes(int pageNumber = 1, int pageSize = 25)
         {
-            var recipes = mongoServiceClient.GetPublicRecipes();
+            var recipes = mongoServiceClient.GetPublicRecipes(pageNumber, pageSize);
 
             return Ok(GetCompleteRecipesBasic(recipes));
         }
