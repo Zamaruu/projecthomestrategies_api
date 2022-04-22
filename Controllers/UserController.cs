@@ -23,17 +23,16 @@ namespace HomeStrategiesApi.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly HomeStrategiesContext _context;
 
-        public UserController() { }
-
         public UserController(ILogger<UserController> logger, HomeStrategiesContext context)
         {
             _logger = logger;
             _context = context;
         }
 
+        //[AllowAnonymous]
         [Authorize(Roles = "Admin")]
-        [HttpGet]
-        public IActionResult Get()
+        [HttpGet("All")]
+        public IActionResult GetAllUsers()
         {
             return Ok(_context.User);
         }

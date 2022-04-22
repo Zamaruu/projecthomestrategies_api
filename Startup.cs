@@ -44,7 +44,7 @@ namespace HomeStrategiesApi
                 options.AddPolicy("AllowAll",
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:60648")
+                        builder.WithOrigins("http://localhost:3000")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials();
