@@ -9,6 +9,7 @@ using System.Security.Claims;
 using HomeStrategiesApi.Auth;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -28,6 +29,9 @@ namespace HomeStrategiesApi.Controllers
             this.mongoServiceClient = mongoServiceClient;
             _context = context;
         }
+
+        // ------------------------------------------------------------------------------------
+        // Rezepte
 
         // GET: api/<RecipeController>
         [HttpGet("Household/{householdId}")]
@@ -65,6 +69,25 @@ namespace HomeStrategiesApi.Controllers
             return Ok(recipe);
         }
 
+        [HttpGet("Query/{query}")]
+        public IActionResult GetSingleRecipesByName(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Query kann nicht verarbeitet werden");
+            }
+
+            var rawRecipes = mongoServiceClient.GetRecipesByQuery(query);
+            var queriedRecipes = GetCompleteRecipesBasic(rawRecipes);
+
+            if (queriedRecipes == null)
+            {
+                return BadRequest("Es kam zu einem Fehler beim lesen des Rezeptes!");
+            }
+
+            return Ok(queriedRecipes);
+        }
+
         [HttpGet("Public")]
         public IActionResult GetPublicRecipes(int pageNumber = 1, int pageSize = 25)
         {
@@ -86,6 +109,34 @@ namespace HomeStrategiesApi.Controllers
 
             return Ok(createdRecipe);
         }
+
+        // PUT api/<RecipeController>/5
+        [HttpPut("{id}")]
+        public void Put(int id, [FromBody] string value)
+        {
+        }
+
+        // DELETE api/<RecipeController>/5
+        [HttpDelete("{id}")]
+        public IActionResult DeleteRecipe(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest("Id kann nicht verarbeitet werden");
+            }
+
+            var result = mongoServiceClient.DeleteRecipe(id);
+
+            if (result.IsAcknowledged)
+            {
+                return Ok("Rezept gelöscht");
+            }
+
+            return BadRequest(result);
+        }
+
+        // ------------------------------------------------------------------------------------
+        // Favoriten
 
         // POST api/Recipe/Favourite/id
         [HttpPost("Favourites")]
@@ -175,31 +226,77 @@ namespace HomeStrategiesApi.Controllers
             }
         }
 
-
-        // PUT api/<RecipeController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // ------------------------------------------------------------------------------------
+        // Meal Planner
+        [AllowAnonymous]
+        [HttpPost("MealPlanner")]
+        public async Task<IActionResult> CreateMealPlanning(PlannedMeal plannedMeal)
         {
-        }
-
-        // DELETE api/<RecipeController>/5
-        [HttpDelete("{id}")]
-        public IActionResult DeleteRecipe(string id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
+            if (plannedMeal == null)
             {
-                return BadRequest("Id kann nicht verarbeitet werden");
+                return BadRequest("Es gab einen Fehler bei der Übertragung");
             }
 
-            var result = mongoServiceClient.DeleteRecipe(id);
+            var household = await _context.Households.FindAsync(plannedMeal.Household.HouseholdId);
+            var creator = await _context.User.FindAsync(plannedMeal.Creator.UserId);
 
-            if (result.IsAcknowledged)
+            plannedMeal.Household = household;
+            plannedMeal.Creator = creator;
+
+            try
             {
-                return Ok("Rezept gelöscht");
-            }
+                _context.PlannedMeals.Add(plannedMeal);
+                await _context.SaveChangesAsync();
 
-            return BadRequest(result);
+                return Ok("Neues planning wurde erfolgreich gespeichert!");
+            }
+            catch
+            {
+                return BadRequest("Neues planning konnte nicht gespeichert werden!");
+            }
         }
+
+        [HttpGet("MealPlanner")]
+        public async Task<IActionResult> GetMealPlannings()
+        {
+            var userId = GetIdOfSessionUser();
+            var user = _context.User
+                                .Include(u => u.Household)  
+                                .Where(u => u.UserId.Equals(userId))
+                                .FirstOrDefault();
+
+            try
+            {
+                var plannedMealsRaw = _context.PlannedMeals
+                                        .Where(pm => pm.Household.HouseholdId.Equals(user.Household.HouseholdId))
+                                        .ToList();
+
+
+                var plannedMeals = new List<FullPlannedMeal>();
+                foreach (var meal in plannedMealsRaw)
+                {
+                    plannedMeals.Add(new FullPlannedMeal
+                    {
+                        PlannedMealId = meal.PlannedMealId,
+                        StartDay = meal.StartDay,
+                        EndDay = meal.EndDay,
+                        Color = meal.Color,
+                        Creator = meal.Creator,
+                        Recipe = GetCompleteRecipeBasic(meal.RecipeId),
+                    });
+                }
+
+                return Ok(plannedMeals);
+            }
+            catch
+            {
+                return BadRequest("Meal Plannings konnten nicht abegrufen werden");
+            }
+        }
+
+
+        // ------------------------------------------------------------------------------------
+        // Helpers
 
         private bool IsRecipeFavourite(string recipeId)
         {

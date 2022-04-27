@@ -39,17 +39,7 @@ namespace HomeStrategiesApi
         {
             // ----------------------------------------------------------------------------------------
             // Cors policy for Dev Enviroment
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll",
-                    builder =>
-                    {
-                        builder.WithOrigins("http://localhost:3000")
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials();
-                    });
-            });
+            services.AddCors();
 
             services.AddControllers();
 
@@ -137,6 +127,12 @@ namespace HomeStrategiesApi
             //}
 
             //app.UseHttpsRedirection();
+
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials());
 
             app.UseRouting();
 

@@ -14,6 +14,7 @@ namespace HomeStrategiesApi.Helper
         public DbSet<BillCategory> BillCategories { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<RecipeFavourite> RecipeFavourites { get; set; }
+        public DbSet<PlannedMeal> PlannedMeals { get; set; }
 
         public HomeStrategiesContext(DbContextOptions<HomeStrategiesContext> options) : base(options)
         {

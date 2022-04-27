@@ -51,6 +51,11 @@ namespace HomeStrategiesApi.MongoDB
             return collection.Find(recipe => recipe.Id.Equals(id)).FirstOrDefault();
         }
 
+        public List<Recipe> GetRecipesByQuery(string query)
+        {
+            var collection = GetCollection<Recipe>(Collections.Recipes);
+            return collection.Find(recipe => recipe.Name.ToLower().Contains(query.ToLower())).ToList();
+        }
         public List<Recipe> GetRecipes(int householdId)
         {
             var collection = GetCollection<Recipe>(Collections.Recipes);

@@ -15,5 +15,6 @@ namespace HomeStrategiesApi.Models
         public List<User> HouseholdMember { get; set; }
         public List<Bill> HouseholdBills { get; set; }
         public List<BillCategory> HouseholdBillCategories { get; set; }
+        public List<PlannedMeal> PlannedMeals { get; set; }
     }
 }
