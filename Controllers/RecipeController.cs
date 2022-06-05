@@ -280,9 +280,10 @@ namespace HomeStrategiesApi.Controllers
                         PlannedMealId = meal.PlannedMealId,
                         StartDay = meal.StartDay,
                         EndDay = meal.EndDay,
+                        BasicRecipeName = meal.BasicRecipeName,
                         Color = meal.Color,
                         Creator = meal.Creator,
-                        Recipe = GetCompleteRecipeBasic(meal.RecipeId),
+                        Recipe = meal.RecipeId != null? GetCompleteRecipeBasic(meal.RecipeId): null,
                     });
                 }
 
